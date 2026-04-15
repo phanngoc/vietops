@@ -1,0 +1,242 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Core ────────────────────────────────────────────
+
+model Organization {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String   @db.VarChar(255)
+  slug      String   @unique @db.VarChar(100)
+  plan      String   @default("starter") @db.VarChar(50)
+  settings  Json     @default("{}")
+  logoUrl   String?  @map("logo_url")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  users            User[]
+  ticketCategories TicketCategory[]
+  slaPolicies      SlaPolicy[]
+  tickets          Ticket[]
+  catalogItems     CatalogItem[]
+  integrations     Integration[]
+
+  @@map("organizations")
+}
+
+model User {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  email          String   @db.VarChar(255)
+  fullName       String   @map("full_name") @db.VarChar(255)
+  passwordHash   String?  @map("password_hash")
+  role           String   @db.VarChar(50) // admin | manager | agent | user
+  department     String?  @db.VarChar(100)
+  employeeCode   String?  @map("employee_code") @db.VarChar(50)
+  avatarUrl      String?  @map("avatar_url")
+  isActive       Boolean  @default(true) @map("is_active")
+  lastLoginAt    DateTime? @map("last_login_at") @db.Timestamptz()
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt      DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  organization      Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  requestedTickets  Ticket[]           @relation("requester")
+  assignedTickets   Ticket[]           @relation("assignee")
+  comments          TicketComment[]
+  activities        TicketActivity[]
+
+  @@unique([organizationId, email])
+  @@index([organizationId])
+  @@index([email])
+  @@map("users")
+}
+
+// ─── Tickets ─────────────────────────────────────────
+
+model TicketCategory {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId    String   @map("organization_id") @db.Uuid
+  name              String   @db.VarChar(100)
+  nameVi            String?  @map("name_vi") @db.VarChar(100)
+  parentId          String?  @map("parent_id") @db.Uuid
+  icon              String?  @db.VarChar(50)
+  defaultAssigneeId String?  @map("default_assignee_id") @db.Uuid
+  sortOrder         Int      @default(0) @map("sort_order")
+  isActive          Boolean  @default(true) @map("is_active")
+
+  organization Organization    @relation(fields: [organizationId], references: [id])
+  parent       TicketCategory? @relation("CategoryTree", fields: [parentId], references: [id])
+  children     TicketCategory[] @relation("CategoryTree")
+  tickets      Ticket[]
+  catalogItems CatalogItem[]
+
+  @@map("ticket_categories")
+}
+
+model SlaPolicy {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId   String   @map("organization_id") @db.Uuid
+  name             String   @db.VarChar(100)
+  priority         String   @db.VarChar(20) // critical | high | medium | low
+  responseHours    Int      @map("response_hours")
+  resolutionHours  Int      @map("resolution_hours")
+  businessHoursOnly Boolean @default(true) @map("business_hours_only")
+  escalationToId   String?  @map("escalation_to_id") @db.Uuid
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  organization Organization   @relation(fields: [organizationId], references: [id])
+  slaRecords   TicketSlaRecord[]
+
+  @@map("sla_policies")
+}
+
+model Ticket {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  ticketNumber   String    @map("ticket_number") @db.VarChar(20)
+  title          String    @db.VarChar(500)
+  description    String?
+  status         String    @default("open") @db.VarChar(30)
+  priority       String    @default("medium") @db.VarChar(20)
+  categoryId     String?   @map("category_id") @db.Uuid
+  source         String    @default("portal") @db.VarChar(30)
+  requesterId    String    @map("requester_id") @db.Uuid
+  assigneeId     String?   @map("assignee_id") @db.Uuid
+  dueDate        DateTime? @map("due_date") @db.Timestamptz()
+  resolvedAt     DateTime? @map("resolved_at") @db.Timestamptz()
+  closedAt       DateTime? @map("closed_at") @db.Timestamptz()
+  tags           String[]
+  metadata       Json      @default("{}")
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt      DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  organization Organization      @relation(fields: [organizationId], references: [id])
+  category     TicketCategory?   @relation(fields: [categoryId], references: [id])
+  requester    User              @relation("requester", fields: [requesterId], references: [id])
+  assignee     User?             @relation("assignee", fields: [assigneeId], references: [id])
+  comments     TicketComment[]
+  activities   TicketActivity[]
+  slaRecords   TicketSlaRecord[]
+
+  @@index([organizationId])
+  @@index([organizationId, status])
+  @@index([assigneeId])
+  @@index([organizationId, ticketNumber])
+  @@map("tickets")
+}
+
+model TicketSlaRecord {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ticketId     String    @map("ticket_id") @db.Uuid
+  slaPolicyId  String?   @map("sla_policy_id") @db.Uuid
+  slaType      String    @map("sla_type") @db.VarChar(20) // response | resolution
+  targetTime   DateTime  @map("target_time") @db.Timestamptz()
+  actualTime   DateTime? @map("actual_time") @db.Timestamptz()
+  status       String    @default("active") @db.VarChar(20) // active | paused | breached | met
+  breachedAt   DateTime? @map("breached_at") @db.Timestamptz()
+  pauseDuration Int      @default(0) @map("pause_duration")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+
+  ticket    Ticket     @relation(fields: [ticketId], references: [id])
+  slaPolicy SlaPolicy? @relation(fields: [slaPolicyId], references: [id])
+
+  @@index([ticketId])
+  @@index([status, targetTime])
+  @@map("ticket_sla_records")
+}
+
+model TicketComment {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ticketId    String   @map("ticket_id") @db.Uuid
+  authorId    String   @map("author_id") @db.Uuid
+  body        String
+  isInternal  Boolean  @default(false) @map("is_internal")
+  attachments Json     @default("[]")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  ticket Ticket @relation(fields: [ticketId], references: [id])
+  author User   @relation(fields: [authorId], references: [id])
+
+  @@map("ticket_comments")
+}
+
+model TicketActivity {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ticketId  String   @map("ticket_id") @db.Uuid
+  actorId   String?  @map("actor_id") @db.Uuid
+  action    String   @db.VarChar(50)
+  oldValue  String?  @map("old_value")
+  newValue  String?  @map("new_value")
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  ticket Ticket @relation(fields: [ticketId], references: [id])
+  actor  User?  @relation(fields: [actorId], references: [id])
+
+  @@map("ticket_activities")
+}
+
+// ─── Service Catalog ─────────────────────────────────
+
+model CatalogItem {
+  id                String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId    String  @map("organization_id") @db.Uuid
+  name              String  @db.VarChar(255)
+  nameVi            String? @map("name_vi") @db.VarChar(255)
+  description       String?
+  categoryId        String? @map("category_id") @db.Uuid
+  icon              String? @db.VarChar(50)
+  estimatedHours    Int?    @map("estimated_hours")
+  formSchema        Json    @default("{}") @map("form_schema")
+  defaultAssigneeId String? @map("default_assignee_id") @db.Uuid
+  approvalRequired  Boolean @default(false) @map("approval_required")
+  approverId        String? @map("approver_id") @db.Uuid
+  isActive          Boolean @default(true) @map("is_active")
+  sortOrder         Int     @default(0) @map("sort_order")
+
+  organization Organization    @relation(fields: [organizationId], references: [id])
+  category     TicketCategory? @relation(fields: [categoryId], references: [id])
+
+  @@map("catalog_items")
+}
+
+// ─── Notifications ───────────────────────────────────
+
+model Notification {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  recipientId    String    @map("recipient_id") @db.Uuid
+  ticketId       String?   @map("ticket_id") @db.Uuid
+  title          String?   @db.VarChar(255)
+  body           String?
+  channel        String?   @db.VarChar(20)
+  status         String    @default("pending") @db.VarChar(20)
+  sentAt         DateTime? @map("sent_at") @db.Timestamptz()
+  readAt         DateTime? @map("read_at") @db.Timestamptz()
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+
+  @@map("notifications")
+}
+
+// ─── Integrations ────────────────────────────────────
+
+model Integration {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  type           String    @db.VarChar(50) // github | slack | amis_hrm | bamboohr | teams
+  name           String?   @db.VarChar(100)
+  config         Json
+  isActive       Boolean   @default(true) @map("is_active")
+  lastSyncAt     DateTime? @map("last_sync_at") @db.Timestamptz()
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@map("integrations")
+}

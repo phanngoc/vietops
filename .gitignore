@@ -9,4 +9,5 @@ build/
 .DS_Store
 coverage/
 .nyc_output/
-prisma/migrations/dev/
+.turbo/
+*.tsbuildinfo
