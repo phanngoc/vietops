@@ -8,6 +8,7 @@ import type { Env } from './config.js'
 import prismaPlugin from './plugins/prisma.js'
 import authPlugin from './plugins/auth.js'
 import { authRoutes } from './modules/auth/auth.routes.js'
+import { ticketRoutes } from './modules/tickets/ticket.routes.js'
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -78,6 +79,7 @@ export async function buildApp(config: Env) {
 
   // Routes
   await app.register(authRoutes, { prefix: '/auth' })
+  await app.register(ticketRoutes, { prefix: '/tickets' })
 
   return app
 }
