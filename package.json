@@ -14,6 +14,7 @@
     "test": "turbo test",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md}\"",
+    "e2e": "npm run test --workspace=@vietops/e2e",
     "db:migrate": "npm run db:migrate --workspace=@vietops/api",
     "db:seed": "npm run db:seed --workspace=@vietops/api",
     "db:studio": "npm run db:studio --workspace=@vietops/api"
