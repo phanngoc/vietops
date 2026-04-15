@@ -5,5 +5,6 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     include: ['src/**/*.test.ts'],
+    fileParallelism: false, // shared test DB — prevent concurrent teardown interference
   },
 })
