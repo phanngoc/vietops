@@ -223,7 +223,7 @@ CREATE TABLE notifications (
 CREATE TABLE integrations (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   organization_id UUID NOT NULL REFERENCES organizations(id),
-  type            VARCHAR(50) NOT NULL,           -- jira | slack | amis_hrm | bamboohr | teams
+  type            VARCHAR(50) NOT NULL,           -- github | slack | amis_hrm | bamboohr | teams
   name            VARCHAR(100),
   config          JSONB NOT NULL,                 -- encrypted credentials, URLs
   is_active       BOOLEAN DEFAULT TRUE,
@@ -232,17 +232,18 @@ CREATE TABLE integrations (
 );
 ```
 
-### jira_links
+### github_issue_links
 ```sql
-CREATE TABLE jira_links (
-  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  ticket_id       UUID NOT NULL REFERENCES tickets(id),
-  integration_id  UUID NOT NULL REFERENCES integrations(id),
-  jira_issue_key  VARCHAR(50) NOT NULL,           -- e.g. "PROJ-123"
-  jira_issue_url  TEXT,
-  sync_status     VARCHAR(20) DEFAULT 'active',
-  last_synced_at  TIMESTAMPTZ,
-  created_at      TIMESTAMPTZ DEFAULT NOW()
+CREATE TABLE github_issue_links (
+  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  ticket_id           UUID NOT NULL REFERENCES tickets(id),
+  integration_id      UUID NOT NULL REFERENCES integrations(id),
+  github_repo         VARCHAR(255) NOT NULL,        -- e.g. "org/repo"
+  github_issue_number INT NOT NULL,                 -- e.g. 123
+  github_issue_url    TEXT,
+  sync_status         VARCHAR(20) DEFAULT 'active',
+  last_synced_at      TIMESTAMPTZ,
+  created_at          TIMESTAMPTZ DEFAULT NOW()
 );
 ```
 
@@ -390,7 +391,7 @@ CREATE TABLE leave_records (
   end_date        DATE NOT NULL,
   status          VARCHAR(20) DEFAULT 'approved', -- pending | approved | rejected
   external_id     VARCHAR(100),                  -- ID từ HR system
-  synced_to_jira  BOOLEAN DEFAULT FALSE,
+  synced_to_github BOOLEAN DEFAULT FALSE,
   created_at      TIMESTAMPTZ DEFAULT NOW()
 );
 ```

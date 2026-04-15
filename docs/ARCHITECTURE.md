@@ -8,7 +8,7 @@ VietOps là multi-tenant SaaS platform theo kiến trúc monolith-modular (Phase
 ┌──────────────────────────────────────────────────────────────┐
 │                         Clients                              │
 │   Web Browser (Next.js)    │    Mobile App (React Native)   │
-│   External Systems (Jira, AMIS HRM, BambooHR, Slack)        │
+│   External Systems (GitHub, AMIS HRM, BambooHR, Slack)      │
 └────────────────────────────┬─────────────────────────────────┘
                              │ HTTPS / WSS
 ┌────────────────────────────▼─────────────────────────────────┐
@@ -29,7 +29,7 @@ VietOps là multi-tenant SaaS platform theo kiến trúc monolith-modular (Phase
 │                                                              │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐  │
 │  │ Workflow     │  │ Notification │  │ Integration Hub  │  │
-│  │ Engine       │  │ Service      │  │ - Jira           │  │
+│  │ Engine       │  │ Service      │  │ - GitHub         │  │
 │  │ - State      │  │ - Email      │  │ - Slack/Teams    │  │
 │  │   machine    │  │ - Slack      │  │ - AMIS HRM       │  │
 │  │ - Triggers   │  │ - In-app     │  │ - BambooHR       │  │
@@ -172,24 +172,24 @@ type WorkflowAction =
   | { type: 'send_notification'; channel: Channel; template: string }
   | { type: 'update_ticket'; fields: Partial<Ticket> }
   | { type: 'call_webhook'; url: string; payload: object }
-  | { type: 'create_jira_issue'; project: string; template: JiraTemplate }
+  | { type: 'create_github_issue'; repo: string; template: GitHubIssueTemplate }
 ```
 
 ---
 
 ## 6. Integration Architecture
 
-### Jira Integration
+### GitHub Issues Integration
 ```
-VietOps Ticket ←→ Jira Issue
+VietOps Ticket ←→ GitHub Issue
 
-OAuth 2.0 flow cho authentication
+OAuth 2.0 flow cho authentication (GitHub App)
 Bi-directional sync via:
-  - VietOps → Jira: Create issue, update status, add comment
-  - Jira → VietOps: Webhook for status changes
+  - VietOps → GitHub: Create issue, update status, add comment (Octokit)
+  - GitHub → VietOps: Webhook for issue events
 
 Sync Worker (BullMQ):
-  - Queue: jira-sync
+  - Queue: github-sync
   - Retry: 3 lần với exponential backoff
   - Conflict resolution: "last write wins" với timestamp check
 ```

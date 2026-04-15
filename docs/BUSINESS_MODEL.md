@@ -9,11 +9,11 @@
 - **Công ty outsource lớn**: FPT Software (54,000+), TMA Solutions (4,000+), Rikkeisoft (2,000+), KMS, NashTech, Axon Active, Savvycom
 
 ### Pain Points Được Xác Nhận
-1. **Tool rời rạc**: Excel + email + Jira trộn lẫn, không có workflow tự động
+1. **Tool rời rạc**: Excel + email + GitHub Issues trộn lẫn, không có workflow tự động
 2. **ServiceNow quá đắt**: $50–150/user/month = $600K–1.8M/năm cho 1000 dev (7–20% payroll)
 3. **Onboarding thủ công**: Developer mới cần 2+ tuần, không có workflow chuẩn
 4. **SLA thiếu minh bạch**: Client Nhật/Úc/EU yêu cầu báo cáo SLA nhưng không có tool
-5. **Leave ≠ Availability**: HR system tách biệt Jira, manager không biết dev đang nghỉ
+5. **Leave ≠ Availability**: HR system tách biệt GitHub Issues, manager không biết dev đang nghỉ
 
 ---
 
@@ -23,19 +23,19 @@
 
 | Gói | Giá | Tính năng | Target |
 |-----|-----|-----------|--------|
-| **Starter** | $8/user/tháng | ITSM cơ bản, SLA, portal, Jira sync | Công ty 50–200 dev |
+| **Starter** | $8/user/tháng | ITSM cơ bản, SLA, portal, GitHub Issues sync | Công ty 50–200 dev |
 | **Growth** | $15/user/tháng | Starter + Onboarding workflow, Asset management, HR integration | Công ty 200–1000 dev |
 | **Enterprise** | $25/user/tháng | Growth + Multi-client dashboard, AI categorization, Custom workflow, Advanced reporting | FPT, TMA, KMS level |
 | **Self-hosted** | Liên hệ | Toàn bộ tính năng, on-premise | Công ty yêu cầu data nội bộ |
 
 ### So Sánh Cạnh Tranh
 
-| | ServiceNow | Freshservice | Jira SM | **VietOps** |
+| | ServiceNow | Freshservice | GitHub Issues | **VietOps** |
 |--|-----------|-------------|---------|-------------|
 | Giá/user/tháng | $50–150 | $19–99 | $17–47 | **$8–25** |
 | Deploy time | 6+ tháng | 2–4 tuần | 1–2 tuần | **1–2 tuần** |
 | Tiếng Việt | ❌ | ❌ | Cơ bản | **✅ Native** |
-| Jira integration | Phức tạp | Cơ bản | Native | **Native + deep** |
+| GitHub Issues integration | Phức tạp | Cơ bản | Native | **Native + deep** |
 | AMIS/Fast HRM | ❌ | ❌ | ❌ | **✅** |
 | Local support VN | ❌ | ❌ | ❌ | **✅** |
 | Multi-client SLA | ✅ | Giới hạn | ❌ | **✅** |
@@ -63,13 +63,13 @@
 - *"ServiceNow-like experience"* — CTO/IT Manager VN biết ServiceNow, không mua được vì giá
 - *"Deploy trong 2 tuần, không phải 6 tháng"*
 - *"Giá dưới 3% payroll, không phải 7–20%"*
-- *"Tiếng Việt, support nội địa, tích hợp Jira ngay"*
+- *"Tiếng Việt, support nội địa, tích hợp GitHub Issues ngay"*
 
 ### Phase 2: Scale (Tháng 7–18)
 **Target**: 20–50 công ty, bao gồm FPT regional teams, TMA
 
 **Cách tiếp cận**:
-1. **Partner channel**: Hợp tác với Jira/Atlassian resellers tại VN
+1. **Partner channel**: Hợp tác với GitHub/Microsoft resellers tại VN
 2. **Community**: Tech talks tại Tech in Asia, Vietnam Tech Day
 3. **Referral**: Chương trình giới thiệu cho khách hàng hiện có
 4. **Content marketing**: Blog về ITSM best practices cho outsource company VN
@@ -77,7 +77,7 @@
 ### Phase 3: Regional Expansion (Năm 2–3)
 **Target**: Mở rộng sang Philippines, Indonesia, Thailand (outsourcing hubs)
 - **Localization**: Thêm ngôn ngữ, HR system local
-- **Partnership**: Microsoft, Atlassian partner program
+- **Partnership**: Microsoft/GitHub partner program
 
 ---
 
@@ -111,14 +111,14 @@
 ## Competitive Moat
 
 ### Ngắn hạn (0–18 tháng)
-- **Localization first mover**: Đầu tiên có Vietnamese ITSM với Jira + AMIS/Fast HRM integration
+- **Localization first mover**: Đầu tiên có Vietnamese ITSM với GitHub Issues + AMIS/Fast HRM integration
 - **Speed**: Deploy 2 tuần, onboarding nhanh
 - **Price**: 4–6x rẻ hơn ServiceNow
 
 ### Trung hạn (18–36 tháng)
 - **Data network effects**: Ngày càng nhiều data → AI categorization ngày càng tốt hơn cho thị trường VN
 - **Ecosystem lock-in**: Workflow, asset data, SLA history khó migrate
-- **Partner network**: Jira resellers, HR consultants
+- **Partner network**: GitHub/Microsoft resellers, HR consultants
 
 ### Dài hạn (36+ tháng)
 - **Platform extensibility**: App marketplace cho VN-specific integrations
@@ -146,7 +146,7 @@
 
 | Risk | Probability | Impact | Mitigation |
 |------|-------------|--------|-----------|
-| Jira SM mở rộng tính năng HR | Trung bình | Cao | Build deeper VN integrations + price advantage |
+| GitHub Issues mở rộng tính năng ITSM | Trung bình | Cao | Build deeper VN integrations + price advantage |
 | ServiceNow giảm giá cho SMB | Thấp | Cao | Speed + local support là lợi thế khó copy |
 | Khách hàng delay payment | Cao | Trung bình | Upfront payment, credit card billing |
 | Security breach | Thấp | Rất cao | Security audit, pen testing từ sớm, SOC 2 compliance roadmap |

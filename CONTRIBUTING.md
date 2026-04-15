@@ -46,7 +46,7 @@ fix/TKT-XXX-short-description     ← bug fix branches
 type(scope): short description
 
 Types: feat | fix | docs | style | refactor | test | chore
-Scope: ticket | sla | portal | auth | jira | asset | notification
+Scope: ticket | sla | portal | auth | github | asset | notification
 
 Examples:
 feat(ticket): add SLA breach email notification

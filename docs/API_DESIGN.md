@@ -86,7 +86,7 @@ Response 201:
 ```
 
 ### GET /tickets/:id
-Full ticket detail với comments, activity log, SLA records, Jira links.
+Full ticket detail với comments, activity log, SLA records, GitHub issue links.
 
 ### PATCH /tickets/:id
 ```json
@@ -108,10 +108,10 @@ Request:
 }
 ```
 
-### POST /tickets/:id/jira-links
+### POST /tickets/:id/github-links
 ```json
-Request: { "jira_issue_key": "INFRA-123" }
-Response 201: { "id": "...", "jira_issue_key": "INFRA-123", "jira_issue_url": "..." }
+Request: { "github_issue_number": 123, "github_repo": "org/repo" }
+Response 201: { "id": "...", "github_issue_number": 123, "github_issue_url": "https://github.com/org/repo/issues/123" }
 ```
 
 ---
@@ -219,10 +219,10 @@ Response: { "daily": [...], "by_category": [...], "by_status": [...] }
 ### GET /integrations
 List active integrations cho org.
 
-### POST /integrations/jira/connect
+### POST /integrations/github/connect
 ```json
-Request: { "oauth_code": "...", "redirect_uri": "..." }
-Response 201: { "id": "uuid", "type": "jira", "name": "Our Jira", "is_active": true }
+Request: { "installation_id": "...", "oauth_code": "..." }
+Response 201: { "id": "uuid", "type": "github", "name": "Our GitHub", "is_active": true }
 ```
 
 ### POST /integrations/slack/connect

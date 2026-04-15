@@ -36,7 +36,7 @@ Jan ──────────── Apr ───────────�
 - [ ] Service catalog: catalog items, dynamic forms
 
 ### Month 3 — Polish & Integrations
-- [ ] Jira integration: OAuth, link ticket ↔ issue, status sync
+- [ ] GitHub Issues integration: OAuth, link ticket ↔ issue, status sync
 - [ ] Reports: SLA compliance, ticket volume, MTTR
 - [ ] Report export: PDF, CSV
 - [ ] Admin panel: org settings, SLA policy config, team management
@@ -51,7 +51,7 @@ Jan ──────────── Apr ───────────�
 
 ## Phase 2: Developer Lifecycle (Tháng 4–6)
 
-**Goal**: Automate onboarding/offboarding, asset tracking, leave sync — differentiate từ Jira SM và Freshservice.
+**Goal**: Automate onboarding/offboarding, asset tracking, leave sync — differentiate từ GitHub Issues và Freshservice.
 
 ### Month 4 — Onboarding & Offboarding
 - [ ] Workflow template engine: trigger → steps → actions
@@ -71,7 +71,7 @@ Jan ──────────── Apr ───────────�
 
 ### Month 6 — Leave Sync & Multi-tenant
 - [ ] Leave calendar ingestion from HR webhooks
-- [ ] Leave ↔ Jira availability sync (block assignment during leave)
+- [ ] Leave ↔ GitHub Issues availability sync (warn assignment during leave)
 - [ ] Manager availability dashboard
 - [ ] Multi-tenant admin: manage multiple orgs (for resellers/MSPs)
 - [ ] Per-tenant custom branding (logo, colors)
@@ -96,7 +96,7 @@ Jan ──────────── Apr ───────────�
 ### Month 9–10 — Custom Workflow Builder
 - [ ] Visual workflow designer (React Flow)
 - [ ] Trigger types: webhook, schedule, ticket event, HR event
-- [ ] Action types: create ticket, notify, call API, create Jira issue
+- [ ] Action types: create ticket, notify, call API, create GitHub issue
 - [ ] Workflow versioning and rollback
 - [ ] Workflow marketplace: share templates between orgs
 
@@ -121,7 +121,7 @@ Jan ──────────── Apr ───────────�
 | Ticket CRUD + SLA | Very High | Medium | P0 |
 | Self-service portal | Very High | Medium | P0 |
 | Email notifications | High | Low | P0 |
-| Jira integration | High | Medium | P0 |
+| GitHub Issues integration | High | Medium | P0 |
 | Slack integration | Medium | Low | P1 |
 | SLA reports | High | Medium | P1 |
 | Onboarding workflow | Very High | High | P1 |
@@ -138,12 +138,12 @@ Jan ──────────── Apr ───────────�
 ## Dependencies & Risks
 
 ### Technical Dependencies
-- Jira OAuth app approval (1–2 tuần)
+- GitHub App approval & OAuth setup (1–2 tuần)
 - AMIS HRM API documentation (cần liên hệ vendor)
 - Email delivery reliability (SendGrid/Mailgun setup)
 
 ### Business Risks
-- **Jira SM expansion**: Atlassian có thể mở rộng JSM vào HR space
+- **GitHub Issues expansion**: GitHub có thể mở rộng Issues/Projects vào ITSM space
   - Mitigation: Build deeper VN integration faster, price advantage
 - **Customer slow adoption**: IT Manager VN conservative về tools mới
   - Mitigation: Free 3-month pilot, guided onboarding

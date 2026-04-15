@@ -15,12 +15,12 @@
 | Giá | $50–150/user/mo | $19–99/user/mo | **$8–25/user/mo** |
 | Thời gian deploy | 6+ tháng | 2–4 tuần | **1–2 tuần** |
 | Tiếng Việt | ❌ | ❌ | ✅ |
-| Tích hợp Jira | Phức tạp | Cơ bản | **Native, sâu** |
+| Tích hợp GitHub Issues | Phức tạp | Cơ bản | **Native, sâu** |
 | Tích hợp HR VN (AMIS, Fast) | ❌ | ❌ | ✅ |
 | SLA multi-client | ✅ | Giới hạn | ✅ |
 | Support nội địa | ❌ | ❌ | ✅ |
 
-**Mục tiêu:** Thay thế hàng chục tool rời rạc (Excel + email + Jira trộn lẫn) bằng 1 platform duy nhất, giá phù hợp với thị trường Việt Nam.
+**Mục tiêu:** Thay thế hàng chục tool rời rạc (Excel + email + GitHub Issues trộn lẫn) bằng 1 platform duy nhất, giá phù hợp với thị trường Việt Nam.
 
 ---
 
@@ -41,13 +41,13 @@
 - **Self-Service Portal**: Service catalog, request tracking
 - **Notification System**: Email + Slack
 - **Dashboard & Reports**: Real-time KPI, SLA compliance reports
-- **Jira Integration**: Bi-directional sync
+- **GitHub Issues Integration**: Bi-directional sync
 
 ### Phase 2 — Developer Lifecycle (Tháng 4–6)
 - **Onboarding/Offboarding Workflows**: Auto-triggered, checklist-based
 - **Asset Management (CMDB Lite)**: Thiết bị, check-in/out, warranty alerts
 - **HR Integration**: AMIS HRM, BambooHR webhooks
-- **Leave ↔ Availability Sync**: Real-time Jira capacity update
+- **Leave ↔ Availability Sync**: Real-time GitHub Issues capacity update
 - **Multi-tenant**: Quản lý nhiều công ty trên 1 platform
 
 ### Phase 3 — Intelligence & Scale (Tháng 7–12)
@@ -94,7 +94,7 @@
                                           │
                               ┌───────────┴──────────┐
                               ▼                      ▼
-                        Jira API            Email/Slack/Teams
+                       GitHub API           Email/Slack/Teams
                       AMIS HRM API          HR Webhooks
 ```
 
