@@ -49,6 +49,7 @@ model User {
   assignedTickets   Ticket[]           @relation("assignee")
   comments          TicketComment[]
   activities        TicketActivity[]
+  refreshTokens     RefreshToken[]
 
   @@unique([organizationId, email])
   @@index([organizationId])
@@ -208,6 +209,19 @@ model CatalogItem {
 
 // ─── Notifications ───────────────────────────────────
 
+model NotificationTemplate {
+  id             String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String  @map("organization_id") @db.Uuid
+  event          String  @db.VarChar(100) // ticket_created | ticket_assigned | sla_warning | sla_breached
+  channel        String  @db.VarChar(20) // email | in_app | slack
+  subject        String? @db.VarChar(500)
+  bodyTemplate   String  @map("body_template")
+  isActive       Boolean @default(true) @map("is_active")
+
+  @@unique([organizationId, event, channel])
+  @@map("notification_templates")
+}
+
 model Notification {
   id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   organizationId String    @map("organization_id") @db.Uuid
@@ -221,7 +235,26 @@ model Notification {
   readAt         DateTime? @map("read_at") @db.Timestamptz()
   createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz()
 
+  @@index([organizationId, recipientId])
+  @@index([recipientId, readAt])
   @@map("notifications")
+}
+
+// ─── Auth ────────────────────────────────────────────
+
+model RefreshToken {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  token     String   @unique @db.VarChar(500)
+  expiresAt DateTime @map("expires_at") @db.Timestamptz()
+  revokedAt DateTime? @map("revoked_at") @db.Timestamptz()
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
 }
 
 // ─── Integrations ────────────────────────────────────
