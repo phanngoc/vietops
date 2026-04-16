@@ -139,8 +139,9 @@ model TicketSlaRecord {
   targetTime   DateTime  @map("target_time") @db.Timestamptz()
   actualTime   DateTime? @map("actual_time") @db.Timestamptz()
   status       String    @default("active") @db.VarChar(20) // active | paused | breached | met
-  breachedAt   DateTime? @map("breached_at") @db.Timestamptz()
-  pauseDuration Int      @default(0) @map("pause_duration")
+  breachedAt    DateTime? @map("breached_at") @db.Timestamptz()
+  pausedAt      DateTime? @map("paused_at") @db.Timestamptz()
+  pauseDuration Int       @default(0) @map("pause_duration")
   createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz()
 
   ticket    Ticket     @relation(fields: [ticketId], references: [id])
