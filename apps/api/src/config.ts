@@ -15,6 +15,11 @@ const envSchema = z.object({
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
 
+  // Email
+  SMTP_URL: z.string().optional(),
+  EMAIL_FROM: z.string().email().optional(),
+  EMAIL_WEBHOOK_SECRET: z.string().optional(),
+
   APP_URL: z.string().url().default('http://localhost:3000'),
   API_URL: z.string().url().default('http://localhost:3001'),
 })
