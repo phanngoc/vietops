@@ -163,7 +163,12 @@ export class TicketService {
       }
     }
 
-    return { ...ticket, slaPolicy: slaPolicy ? { priority: slaPolicy.priority, responseHours: slaPolicy.responseHours, resolutionHours: slaPolicy.resolutionHours } : null }
+    const result = { ...ticket, slaPolicy: slaPolicy ? { priority: slaPolicy.priority, responseHours: slaPolicy.responseHours, resolutionHours: slaPolicy.resolutionHours } : null }
+
+    // Realtime: broadcast to org room
+    void this.app.rooms?.emit(`org:${user.organizationId}`, 'ticket.created', result)
+
+    return result
   }
 
   // ── List ───────────────────────────────────────────────────────────────────
@@ -377,6 +382,10 @@ export class TicketService {
 
       return ticket
     })
+
+    // Realtime: broadcast to org room and to the specific ticket room
+    void this.app.rooms?.emit(`org:${user.organizationId}`, 'ticket.updated', updated)
+    void this.app.rooms?.emit(`ticket:${ticketId}`, 'ticket.updated', updated)
 
     return updated
   }
