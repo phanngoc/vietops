@@ -8,6 +8,7 @@ import {
   type CreateCommentInput,
   type UpdateCommentInput,
 } from './ticket.schema.js'
+import { scheduleSlaChecks, SlaService } from '../sla/sla.service.js'
 
 interface JwtUser {
   userId: string
@@ -151,6 +152,16 @@ export class TicketService {
 
       return created
     })
+
+    // Schedule breach-check jobs outside the transaction
+    if (slaPolicy) {
+      const createdRecords = await this.prisma.ticketSlaRecord.findMany({
+        where: { ticketId: ticket.id },
+      })
+      for (const r of createdRecords) {
+        await scheduleSlaChecks(this.app, { id: r.id, createdAt: r.createdAt, targetTime: r.targetTime })
+      }
+    }
 
     return { ...ticket, slaPolicy: slaPolicy ? { priority: slaPolicy.priority, responseHours: slaPolicy.responseHours, resolutionHours: slaPolicy.resolutionHours } : null }
   }
@@ -335,20 +346,33 @@ export class TicketService {
         })
       }
 
+      const slaService = new SlaService(this.app)
+      const now = new Date()
+
       // SLA: mark response SLA as met when status changes from open
       if (input.status && input.status !== 'open' && existing.status === 'open') {
         await tx.ticketSlaRecord.updateMany({
           where: { ticketId, slaType: 'response', status: 'active' },
-          data: { status: 'met', actualTime: new Date() },
+          data: { status: 'met', actualTime: now },
         })
       }
 
       // SLA: mark resolution SLA as met when resolved/closed
       if (input.status === 'resolved' || input.status === 'closed') {
         await tx.ticketSlaRecord.updateMany({
-          where: { ticketId, slaType: 'resolution', status: 'active' },
-          data: { status: 'met', actualTime: new Date() },
+          where: { ticketId, slaType: 'resolution', status: { in: ['active', 'paused'] } },
+          data: { status: 'met', actualTime: now },
         })
+      }
+
+      // SLA: pause when entering pending_customer
+      if (input.status === 'pending_customer' && existing.status !== 'pending_customer') {
+        await slaService.pauseSlaRecords(ticketId, now, tx)
+      }
+
+      // SLA: resume when leaving pending_customer
+      if (input.status && input.status !== 'pending_customer' && existing.status === 'pending_customer') {
+        await slaService.resumeSlaRecords(ticketId, now, tx)
       }
 
       return ticket

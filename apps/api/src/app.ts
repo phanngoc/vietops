@@ -6,9 +6,11 @@ import jwt from '@fastify/jwt'
 import sensible from '@fastify/sensible'
 import type { Env } from './config.js'
 import prismaPlugin from './plugins/prisma.js'
+import queuePlugin from './plugins/queue.js'
 import authPlugin from './plugins/auth.js'
 import { authRoutes } from './modules/auth/auth.routes.js'
 import { ticketRoutes } from './modules/tickets/ticket.routes.js'
+import { slaRoutes } from './modules/sla/sla.routes.js'
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -71,6 +73,9 @@ export async function buildApp(config: Env) {
   // Database
   await app.register(prismaPlugin)
 
+  // Queue (BullMQ)
+  await app.register(queuePlugin)
+
   // Auth middleware
   await app.register(authPlugin)
 
@@ -80,6 +85,7 @@ export async function buildApp(config: Env) {
   // Routes
   await app.register(authRoutes, { prefix: '/auth' })
   await app.register(ticketRoutes, { prefix: '/tickets' })
+  await app.register(slaRoutes)
 
   return app
 }
