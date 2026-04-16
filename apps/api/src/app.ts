@@ -7,10 +7,12 @@ import sensible from '@fastify/sensible'
 import type { Env } from './config.js'
 import prismaPlugin from './plugins/prisma.js'
 import queuePlugin from './plugins/queue.js'
+import mailerPlugin from './plugins/mailer.js'
 import authPlugin from './plugins/auth.js'
 import { authRoutes } from './modules/auth/auth.routes.js'
 import { ticketRoutes } from './modules/tickets/ticket.routes.js'
 import { slaRoutes } from './modules/sla/sla.routes.js'
+import { emailRoutes } from './modules/email/email.routes.js'
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -76,6 +78,9 @@ export async function buildApp(config: Env) {
   // Queue (BullMQ)
   await app.register(queuePlugin)
 
+  // Mailer (no-op in test env)
+  await app.register(mailerPlugin)
+
   // Auth middleware
   await app.register(authPlugin)
 
@@ -86,6 +91,7 @@ export async function buildApp(config: Env) {
   await app.register(authRoutes, { prefix: '/auth' })
   await app.register(ticketRoutes, { prefix: '/tickets' })
   await app.register(slaRoutes)
+  await app.register(emailRoutes)
 
   return app
 }
