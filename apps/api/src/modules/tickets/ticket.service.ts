@@ -9,6 +9,7 @@ import {
   type UpdateCommentInput,
 } from './ticket.schema.js'
 import { scheduleSlaChecks, SlaService } from '../sla/sla.service.js'
+import { queueNotification } from '../notifications/notification.service.js'
 
 interface JwtUser {
   userId: string
@@ -167,6 +168,15 @@ export class TicketService {
 
     // Realtime: broadcast to org room
     void this.app.rooms?.emit(`org:${user.organizationId}`, 'ticket.created', result)
+
+    // Notification: alert requester (awaited so test env processes synchronously; errors are swallowed to avoid blocking ticket creation)
+    await queueNotification(this.app, {
+      event: 'ticket.created',
+      organizationId: user.organizationId,
+      recipientId: user.userId,
+      ticketId: result.id,
+      context: { ticketNumber: result.ticketNumber, title: result.title, priority: result.priority },
+    }).catch(() => {})
 
     return result
   }
@@ -386,6 +396,29 @@ export class TicketService {
     // Realtime: broadcast to org room and to the specific ticket room
     void this.app.rooms?.emit(`org:${user.organizationId}`, 'ticket.updated', updated)
     void this.app.rooms?.emit(`ticket:${ticketId}`, 'ticket.updated', updated)
+
+    // Notification: resolved event
+    const resolvedStatuses = ['resolved', 'closed']
+    if (input.status && resolvedStatuses.includes(input.status) && updated.requesterId) {
+      await queueNotification(this.app, {
+        event: 'ticket.resolved',
+        organizationId: user.organizationId,
+        recipientId: updated.requesterId,
+        ticketId,
+        context: { ticketNumber: updated.ticketNumber, title: updated.title, status: updated.status },
+      }).catch(() => {})
+    }
+
+    // Notification: assigned event
+    if (input.assigneeId && input.assigneeId !== existing.assigneeId) {
+      await queueNotification(this.app, {
+        event: 'ticket.assigned',
+        organizationId: user.organizationId,
+        recipientId: input.assigneeId,
+        ticketId,
+        context: { ticketNumber: updated.ticketNumber, title: updated.title },
+      }).catch(() => {})
+    }
 
     return updated
   }

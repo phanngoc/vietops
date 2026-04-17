@@ -15,6 +15,7 @@ import { ticketRoutes } from './modules/tickets/ticket.routes.js'
 import { slaRoutes } from './modules/sla/sla.routes.js'
 import { emailRoutes } from './modules/email/email.routes.js'
 import { realtimeRoutes } from './modules/realtime/realtime.routes.js'
+import { notificationRoutes } from './modules/notifications/notification.routes.js'
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -98,6 +99,7 @@ export async function buildApp(config: Env) {
   await app.register(slaRoutes)
   await app.register(emailRoutes)
   await app.register(realtimeRoutes)
+  await app.register(notificationRoutes)
 
   return app
 }
