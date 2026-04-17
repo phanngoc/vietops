@@ -249,10 +249,12 @@ describe('Email-to-Ticket', () => {
       })
 
       const sent = app.mailer._sent ?? []
-      expect(sent).toHaveLength(1)
-      expect(sent[0]!.to).toBe('user@example.com')
-      expect(sent[0]!.subject).toContain('Need help')
-      expect(sent[0]!.text).toContain('TKT-') // ticket number in body
+      // ticket.created notification may also send an email to the requester, so find the auto-reply specifically
+      const autoReply = sent.find((m) => m.subject?.startsWith('Re:'))
+      expect(autoReply).toBeDefined()
+      expect(autoReply!.to).toBe('user@example.com')
+      expect(autoReply!.subject).toContain('Need help')
+      expect(autoReply!.text).toContain('TKT-') // ticket number in body
     })
 
     it('accepts all senders when emailAllowedDomains is empty', async () => {

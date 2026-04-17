@@ -2,6 +2,7 @@ import { randomBytes } from 'node:crypto'
 import type { FastifyInstance } from 'fastify'
 import { hash, compare } from 'bcrypt'
 import type { LoginInput, RegisterInput, InviteInput, AcceptInviteInput } from './auth.schema.js'
+import { DEFAULT_TEMPLATES } from '../notifications/notification.service.js'
 
 const SALT_ROUNDS = 10
 
@@ -101,6 +102,17 @@ export class AuthService {
           { organizationId: org.id, name: 'Medium', priority: 'medium', responseHours: 8, resolutionHours: 24, businessHoursOnly: true },
           { organizationId: org.id, name: 'Low', priority: 'low', responseHours: 24, resolutionHours: 72, businessHoursOnly: true },
         ],
+      })
+
+      // Seed default notification templates for all events
+      await tx.notificationTemplate.createMany({
+        data: Object.entries(DEFAULT_TEMPLATES).map(([event, tmpl]) => ({
+          organizationId: org.id,
+          event,
+          channel: 'email',
+          subject: tmpl.subject,
+          bodyTemplate: tmpl.body,
+        })),
       })
 
       return { org, user }

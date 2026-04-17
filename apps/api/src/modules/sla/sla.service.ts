@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 import type { SlaCheckJobData } from '../../plugins/queue.js'
 import type { CreateSlaPolicyInput, UpdateSlaPolicyInput } from './sla.schema.js'
+import { queueNotification } from '../notifications/notification.service.js'
 
 interface JwtUser {
   userId: string
@@ -79,6 +80,21 @@ export class SlaService {
         where: { id: slaRecordId },
         data: { status: 'breached', breachedAt: now },
       })
+
+      // Notify assignee/agents in org
+      const ticket = await this.prisma.ticket.findUnique({ where: { id: record.ticketId } })
+      if (ticket) {
+        const recipients = [ticket.assigneeId, ticket.requesterId].filter(Boolean) as string[]
+        for (const recipientId of [...new Set(recipients)]) {
+          await queueNotification(this.app, {
+            event: 'sla.breached',
+            organizationId: ticket.organizationId,
+            recipientId,
+            ticketId: ticket.id,
+            context: { ticketNumber: ticket.ticketNumber, title: ticket.title, slaType: record.slaType },
+          })
+        }
+      }
     }
   }
 

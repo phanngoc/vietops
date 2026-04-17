@@ -41,6 +41,7 @@ model User {
   avatarUrl      String?  @map("avatar_url")
   isActive       Boolean  @default(true) @map("is_active")
   lastLoginAt    DateTime? @map("last_login_at") @db.Timestamptz()
+  metadata       Json     @default("{}") // notification prefs, user settings
   createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt      DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
